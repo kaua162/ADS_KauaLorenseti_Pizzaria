@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="3.0"
+             xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
+             https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+    <persistence-unit name="PizzariaPU" transaction-type="JTA">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <jta-data-source>jdbc/pizzaria</jta-data-source>
+        <class>br.com.pizzaria.entity.PizzaEntity</class>
+        <class>br.com.pizzaria.entity.ClienteEntity</class>
+        <class>br.com.pizzaria.entity.PedidoEntity</class>
+        <class>br.com.pizzaria.entity.EntregaEntity</class>
+        <properties>
+            <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
+            <property name="eclipselink.logging.level" value="FINE"/>
+        </properties>
+    </persistence-unit>
+</persistence>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="content">
+            <h:form id="formEntrega">
+                <p:growl id="msgs" showDetail="true"/>
+                <p:dataTable id="tabelaEntrega" value="#{entregaController.entregaList}"
+                             var="e" paginator="true" rows="10">
+                    <f:facet name="header">
+                        <p:commandButton value="Nova Entrega" icon="pi pi-plus"
+                                         actionListener="#{entregaController.novaEntrega}"
+                                         oncomplete="PF('dlgEntrega').show()"
+                                         update=":formEntrega:dlgEntrega"/>
+                    </f:facet>
+                    <p:column headerText="ID"><h:outputText value="#{e.id}"/></p:column>
+                    <p:column headerText="Pedido"><h:outputText value="#{e.pedido.id}"/></p:column>
+                    <p:column headerText="Endereço"><h:outputText value="#{e.endereco}"/></p:column>
+                    <p:column headerText="Status"><h:outputText value="#{e.status}"/></p:column>
+                    <p:column headerText="Ações">
+                        <p:commandButton icon="pi pi-pencil"
+                                         actionListener="#{entregaController.selecionarEntrega(e)}"
+                                         oncomplete="PF('dlgEntrega').show()"
+                                         update=":formEntrega:dlgEntrega"/>
+                        <p:commandButton icon="pi pi-trash"
+                                         actionListener="#{entregaController.selecionarEntrega(e)}"
+                                         oncomplete="PF('dlgConfirm').show()"
+                                         update=":formEntrega:dlgConfirm"/>
+                    </p:column>
+                </p:dataTable>
+
+                <p:dialog header="Cadastro de Entrega" widgetVar="dlgEntrega"
+                          id="dlgEntrega" modal="true" resizable="false">
+                    <h:panelGrid columns="2" style="margin:10px">
+                        <h:outputLabel value="Pedido:"/>
+                        <p:selectOneMenu value="#{entregaController.entrega.pedido}">
+                            <f:selectItems value="#{entregaController.pedidoList}"
+                                           var="ped" itemLabel="Pedido #{ped.id}" itemValue="#{ped}"/>
+                        </p:selectOneMenu>
+                        <h:outputLabel value="Endereço:"/>
+                        <p:inputText value="#{entregaController.entrega.endereco}"/>
+                        <h:outputLabel value="Status:"/>
+                        <p:selectOneMenu value="#{entregaController.entrega.status}">
+                            <f:selectItem itemLabel="Aguardando" itemValue="Aguardando"/>
+                            <f:selectItem itemLabel="Em rota"    itemValue="Em rota"/>
+                            <f:selectItem itemLabel="Entregue"   itemValue="Entregue"/>
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+                    <p:commandButton value="Salvar"
+                                     action="#{entregaController.entrega.id == 0 ?
+                                              entregaController.adicionarEntrega() :
+                                              entregaController.editarEntrega()}"
+                                     oncomplete="PF('dlgEntrega').hide()"
+                                     update=":formEntrega:tabelaEntrega :formEntrega:msgs"/>
+                </p:dialog>
+
+                <p:confirmDialog id="dlgConfirm" widgetVar="dlgConfirm"
+                                 message="Deseja excluir esta entrega?" header="Confirmação">
+                    <p:commandButton value="Sim" icon="pi pi-check"
+                                     action="#{entregaController.excluirEntrega}"
+                                     oncomplete="PF('dlgConfirm').hide()"
+                                     update=":formEntrega:tabelaEntrega :formEntrega:msgs"/>
+                    <p:commandButton value="Não" icon="pi pi-times"
+                                     onclick="PF('dlgConfirm').hide()"/>
+                </p:confirmDialog>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

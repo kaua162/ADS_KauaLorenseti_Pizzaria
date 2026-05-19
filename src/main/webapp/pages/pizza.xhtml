@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="content">
+            <h:form id="formPizza">
+                <p:growl id="msgs" showDetail="true"/>
+                <p:dataTable id="tabelaPizza" value="#{pizzaController.pizzaList}"
+                             var="p" paginator="true" rows="10">
+                    <f:facet name="header">
+                        <p:commandButton value="Nova Pizza" icon="pi pi-plus"
+                                         actionListener="#{pizzaController.novaPizza}"
+                                         oncomplete="PF('dlgPizza').show()"
+                                         update=":formPizza:dlgPizza"/>
+                    </f:facet>
+                    <p:column headerText="ID" sortBy="#{p.id}">
+                        <h:outputText value="#{p.id}"/>
+                    </p:column>
+                    <p:column headerText="Nome" sortBy="#{p.nome}" filterBy="#{p.nome}">
+                        <h:outputText value="#{p.nome}"/>
+                    </p:column>
+                    <p:column headerText="Descrição">
+                        <h:outputText value="#{p.descricao}"/>
+                    </p:column>
+                    <p:column headerText="Preço">
+                        <h:outputText value="#{p.preco}">
+                            <f:convertNumber type="currency" currencySymbol="R$"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Ações">
+                        <p:commandButton icon="pi pi-pencil" title="Editar"
+                                         actionListener="#{pizzaController.selecionarPizza(p)}"
+                                         oncomplete="PF('dlgPizza').show()"
+                                         update=":formPizza:dlgPizza"/>
+                        <p:commandButton icon="pi pi-trash" title="Excluir"
+                                         actionListener="#{pizzaController.selecionarPizza(p)}"
+                                         oncomplete="PF('dlgConfirm').show()"
+                                         update=":formPizza:dlgConfirm"/>
+                    </p:column>
+                </p:dataTable>
+
+                <p:dialog header="Cadastro de Pizza" widgetVar="dlgPizza"
+                          id="dlgPizza" modal="true" resizable="false">
+                    <h:panelGrid columns="2" style="margin:10px">
+                        <h:outputLabel value="Nome:"/>
+                        <p:inputText value="#{pizzaController.pizza.nome}"/>
+                        <h:outputLabel value="Descrição:"/>
+                        <p:inputText value="#{pizzaController.pizza.descricao}"/>
+                        <h:outputLabel value="Preço:"/>
+                        <p:inputNumber value="#{pizzaController.pizza.preco}" symbol="R$"/>
+                    </h:panelGrid>
+                    <p:commandButton value="Salvar"
+                                     action="#{pizzaController.pizza.id == 0 ?
+                                              pizzaController.adicionarPizza() :
+                                              pizzaController.editarPizza()}"
+                                     oncomplete="PF('dlgPizza').hide()"
+                                     update=":formPizza:tabelaPizza :formPizza:msgs"/>
+                </p:dialog>
+
+                <p:confirmDialog id="dlgConfirm" widgetVar="dlgConfirm"
+                                 message="Deseja excluir esta pizza?" header="Confirmação">
+                    <p:commandButton value="Sim" icon="pi pi-check"
+                                     action="#{pizzaController.excluirPizza}"
+                                     oncomplete="PF('dlgConfirm').hide()"
+                                     update=":formPizza:tabelaPizza :formPizza:msgs"/>
+                    <p:commandButton value="Não" icon="pi pi-times"
+                                     onclick="PF('dlgConfirm').hide()"/>
+                </p:confirmDialog>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="content">
+            <h:form id="formPedido">
+                <p:growl id="msgs" showDetail="true"/>
+                <p:dataTable id="tabelaPedido" value="#{pedidoController.pedidoList}"
+                             var="p" paginator="true" rows="10">
+                    <f:facet name="header">
+                        <p:commandButton value="Novo Pedido" icon="pi pi-plus"
+                                         actionListener="#{pedidoController.novoPedido}"
+                                         oncomplete="PF('dlgPedido').show()"
+                                         update=":formPedido:dlgPedido"/>
+                    </f:facet>
+                    <p:column headerText="ID"><h:outputText value="#{p.id}"/></p:column>
+                    <p:column headerText="Cliente"><h:outputText value="#{p.cliente.nome}"/></p:column>
+                    <p:column headerText="Pizza"><h:outputText value="#{p.pizza.nome}"/></p:column>
+                    <p:column headerText="Qtd"><h:outputText value="#{p.quantidade}"/></p:column>
+                    <p:column headerText="Total">
+                        <h:outputText value="#{p.total}">
+                            <f:convertNumber type="currency" currencySymbol="R$"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Status"><h:outputText value="#{p.status}"/></p:column>
+                    <p:column headerText="Ações">
+                        <p:commandButton icon="pi pi-pencil"
+                                         actionListener="#{pedidoController.selecionarPedido(p)}"
+                                         oncomplete="PF('dlgPedido').show()"
+                                         update=":formPedido:dlgPedido"/>
+                        <p:commandButton icon="pi pi-trash"
+                                         actionListener="#{pedidoController.selecionarPedido(p)}"
+                                         oncomplete="PF('dlgConfirm').show()"
+                                         update=":formPedido:dlgConfirm"/>
+                    </p:column>
+                </p:dataTable>
+
+                <p:dialog header="Cadastro de Pedido" widgetVar="dlgPedido"
+                          id="dlgPedido" modal="true" resizable="false">
+                    <h:panelGrid columns="2" style="margin:10px">
+                        <h:outputLabel value="Cliente:"/>
+                        <p:selectOneMenu value="#{pedidoController.pedido.cliente}">
+                            <f:selectItems value="#{pedidoController.clienteList}"
+                                           var="c" itemLabel="#{c.nome}" itemValue="#{c}"/>
+                        </p:selectOneMenu>
+                        <h:outputLabel value="Pizza:"/>
+                        <p:selectOneMenu value="#{pedidoController.pedido.pizza}">
+                            <f:selectItems value="#{pedidoController.pizzaList}"
+                                           var="pz" itemLabel="#{pz.nome}" itemValue="#{pz}"/>
+                        </p:selectOneMenu>
+                        <h:outputLabel value="Quantidade:"/>
+                        <p:inputNumber value="#{pedidoController.pedido.quantidade}"/>
+                        <h:outputLabel value="Status:"/>
+                        <p:selectOneMenu value="#{pedidoController.pedido.status}">
+                            <f:selectItem itemLabel="Pendente"   itemValue="Pendente"/>
+                            <f:selectItem itemLabel="Em preparo" itemValue="Em preparo"/>
+                            <f:selectItem itemLabel="Entregue"   itemValue="Entregue"/>
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+                    <p:commandButton value="Salvar"
+                                     action="#{pedidoController.pedido.id == 0 ?
+                                              pedidoController.adicionarPedido() :
+                                              pedidoController.editarPedido()}"
+                                     oncomplete="PF('dlgPedido').hide()"
+                                     update=":formPedido:tabelaPedido :formPedido:msgs"/>
+                </p:dialog>
+
+                <p:confirmDialog id="dlgConfirm" widgetVar="dlgConfirm"
+                                 message="Deseja excluir este pedido?" header="Confirmação">
+                    <p:commandButton value="Sim" icon="pi pi-check"
+                                     action="#{pedidoController.excluirPedido}"
+                                     oncomplete="PF('dlgConfirm').hide()"
+                                     update=":formPedido:tabelaPedido :formPedido:msgs"/>
+                    <p:commandButton value="Não" icon="pi pi-times"
+                                     onclick="PF('dlgConfirm').hide()"/>
+                </p:confirmDialog>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
