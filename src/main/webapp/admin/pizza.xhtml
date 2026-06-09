@@ -1,0 +1,129 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+<ui:define name="title">Pizzas</ui:define>
+<ui:define name="content">
+<h:form id="frmList">
+<h:panelGroup id="pngList">
+<p:growl id="growl" showDetail="true"/>
+<p:fieldset toggleable="true">
+<p:dataTable id="datalist" value="#{pizzaController.pizzaList}" var="item" selectionMode="single" selection="#{pizzaController.selected}" widgetVar="datalistPizzaWidgetVar" rowKey="#{item.id}" paginator="true" rows="10" rowsPerPageTemplate="5,10,50,100" emptyMessage="Nenhuma pizza cadastrada...">
+<p:ajax event="rowSelect" update="btnEdit btnDelete btnView"/>
+<p:ajax event="rowUnselect" update="btnEdit btnDelete btnView"/>
+<p:column width="4%" sortBy="#{item.id}" filterBy="#{item.id}">
+<f:facet name="header">
+<h:outputText value="ID"/>
+</f:facet>
+<h:outputText value="#{item.id}"/>
+</p:column>
+<p:column sortBy="#{item.nome}" filterBy="#{item.nome}">
+<f:facet name="header">
+<h:outputText value="Nome"/>
+</f:facet>
+<h:outputText value="#{item.nome}"/>
+</p:column>
+<p:column sortBy="#{item.tamanho}">
+<f:facet name="header">
+<h:outputText value="Tamanho"/>
+</f:facet>
+<h:outputText value="#{item.tamanho.descricao}"/>
+</p:column>
+<p:column sortBy="#{item.preco}">
+<f:facet name="header">
+<h:outputText value="Preço (R$)"/>
+</f:facet>
+<h:outputText value="#{item.preco}">
+<f:convertNumber type="currency" currencySymbol="R$ " locale="pt_BR"/>
+</h:outputText>
+</p:column>
+<p:column>
+<f:facet name="header">
+<h:outputText value="Disponível"/>
+</f:facet>
+<h:outputText value="#{item.disponivel ? 'Sim' : 'Não'}"/>
+</p:column>
+<f:facet name="footer">
+<p:commandButton id="btnCreate" value="Incluir Pizza" icon="pi pi-file" actionListener="#{pizzaController.prepareAdicionar()}" update=":CreateForm" onclick="PF('dlgCreate').show()"/>
+<p:commandButton id="btnEdit" value="Editar Pizza" icon="pi pi-user-edit" update=":EditForm" oncomplete="PF('dlgEdit').show()" disabled="#{empty pizzaController.selected}"/>
+<p:commandButton id="btnDelete" value="Excluir Pizza" icon="pi pi-trash" actionListener="#{pizzaController.deletarPizza()}" update=":frmList" disabled="#{empty pizzaController.selected}">
+<p:confirm header="Confirmar Exclusão" message="Você confirma exclusão do registro?" icon="ui-icon-alert"/>
+</p:commandButton>
+<p:commandButton id="btnView" value="Detalhes da Pizza" icon="pi pi-eye" update="formView" oncomplete="PF('dlgView').show()" disabled="#{empty pizzaController.selected}"/>
+</f:facet>
+</p:dataTable>
+</p:fieldset>
+<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+<p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check"/>
+<p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-times"/>
+</p:confirmDialog>
+</h:panelGroup>
+</h:form>
+<p:dialog widgetVar="dlgCreate" modal="true" resizable="false" appendTo="@(body)" header="Criar Pizza">
+<h:form id="CreateForm">
+<p:growl id="growl" showDetail="true"/>
+<h:panelGroup id="display">
+<h:panelGrid columns="2" rendered="#{pizzaController.pizza != null}">
+<p:outputLabel value="Nome: " for="iptNome"/>
+<p:inputText id="iptNome" size="40" required="true" requiredMessage="Nome é obrigatório" value="#{pizzaController.pizza.nome}"/>
+<p:outputLabel value="Descrição: " for="iptDesc"/>
+<p:inputTextarea id="iptDesc" rows="3" cols="30" value="#{pizzaController.pizza.descricao}"/>
+<p:outputLabel value="Tamanho: " for="somTamanho"/>
+<p:selectOneMenu id="somTamanho" value="#{pizzaController.pizza.tamanho}" required="true" requiredMessage="Tamanho é obrigatório">
+<f:selectItem itemLabel="Selecione..."/>
+<f:selectItems value="#{pizzaController.tamanhos}" var="t" itemLabel="#{t.descricao}" itemValue="#{t}"/>
+</p:selectOneMenu>
+<p:outputLabel value="Preço (R$): " for="iptPreco"/>
+<p:inputText id="iptPreco" size="10" required="true" requiredMessage="Preço é obrigatório" value="#{pizzaController.pizza.preco}">
+<f:convertNumber minFractionDigits="2" maxFractionDigits="2" locale="pt_BR"/>
+</p:inputText>
+<p:outputLabel value="Disponível: " for="sbbDisp"/>
+<p:selectBooleanCheckbox id="sbbDisp" value="#{pizzaController.pizza.disponivel}"/>
+</h:panelGrid>
+<p:commandButton actionListener="#{pizzaController.adicionarPizza()}" value="Cadastrar" icon="pi pi-save" update="display,:frmList" onclick="dlgCreate.hide()"/>
+</h:panelGroup>
+</h:form>
+</p:dialog>
+<p:dialog widgetVar="dlgEdit" modal="true" resizable="false" appendTo="@(body)" header="Editar Pizza">
+<h:form id="EditForm">
+<p:growl id="growl" showDetail="true"/>
+<h:panelGroup id="display">
+<h:panelGrid columns="2" rendered="#{pizzaController.selected != null}">
+<p:outputLabel value="Nome: " for="iptNome"/>
+<p:inputText id="iptNome" size="40" required="true" value="#{pizzaController.selected.nome}"/>
+<p:outputLabel value="Descrição: " for="iptDesc"/>
+<p:inputTextarea id="iptDesc" rows="3" cols="30" value="#{pizzaController.selected.descricao}"/>
+<p:outputLabel value="Tamanho: " for="somTamanho"/>
+<p:selectOneMenu id="somTamanho" value="#{pizzaController.selected.tamanho}" required="true">
+<f:selectItems value="#{pizzaController.tamanhos}" var="t" itemLabel="#{t.descricao}" itemValue="#{t}"/>
+</p:selectOneMenu>
+<p:outputLabel value="Preço (R$): " for="iptPreco"/>
+<p:inputText id="iptPreco" size="10" required="true" value="#{pizzaController.selected.preco}">
+<f:convertNumber minFractionDigits="2" maxFractionDigits="2" locale="pt_BR"/>
+</p:inputText>
+<p:outputLabel value="Disponível: " for="sbbDisp"/>
+<p:selectBooleanCheckbox id="sbbDisp" value="#{pizzaController.selected.disponivel}"/>
+</h:panelGrid>
+<p:commandButton actionListener="#{pizzaController.editarPizza()}" value="Salvar" icon="pi pi-save" update="display,:frmList" onclick="dlgEdit.hide()"/>
+</h:panelGroup>
+</h:form>
+</p:dialog>
+<p:dialog header="Detalhes da Pizza" widgetVar="dlgView" height="300" width="500" showEffect="fade" modal="true">
+<h:form id="formView">
+<h:panelGrid columns="2" rendered="#{pizzaController.selected != null}">
+<p:outputLabel value="ID:"/>
+<p:outputLabel value="#{pizzaController.selected.id}"/>
+<p:outputLabel value="Nome:"/>
+<p:outputLabel value="#{pizzaController.selected.nome}"/>
+<p:outputLabel value="Descrição:"/>
+<p:outputLabel value="#{pizzaController.selected.descricao}"/>
+<p:outputLabel value="Tamanho:"/>
+<p:outputLabel value="#{pizzaController.selected.tamanho.descricao}"/>
+<p:outputLabel value="Preço:"/>
+<h:outputText value="#{pizzaController.selected.preco}">
+<f:convertNumber type="currency" currencySymbol="R$ " locale="pt_BR"/>
+</h:outputText>
+<p:outputLabel value="Disponível:"/>
+<p:outputLabel value="#{pizzaController.selected.disponivel ? 'Sim' : 'Não'}"/>
+</h:panelGrid>
+</h:form>
+</p:dialog>
+</ui:define>
+</ui:composition>

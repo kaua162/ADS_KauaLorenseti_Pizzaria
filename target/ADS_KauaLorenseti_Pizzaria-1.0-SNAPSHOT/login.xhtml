@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <title>Pizzaria - Login</title>
+        <h:outputStylesheet library="manhattan-layout" name="css/layout-orange-indigo.css"/>
+        <style>
+            body { background-color: #f5f5f5; }
+            .login-wrapper {
+                display: flex; justify-content: center;
+                align-items: center; height: 100vh;
+            }
+            .login-panel {
+                width: 360px; padding: 2rem;
+                background: #fff; border-radius: 8px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            }
+            .login-logo {
+                text-align: center; margin-bottom: 1.5rem;
+                font-size: 1.8rem; color: #e65100; font-weight: bold;
+            }
+        </style>
+    </h:head>
+
+    <h:body>
+        <div class="login-wrapper">
+            <div class="login-panel">
+                <div class="login-logo">
+                    🍕 Pizzaria
+                </div>
+
+                <h:form id="formLogin">
+                    <p:messages id="msgs" showDetail="true" closable="true"/>
+
+                    <div class="p-field" style="margin-bottom: 1rem;">
+                        <p:outputLabel for="email" value="E-mail"/>
+                        <p:inputText id="email"
+                                     value="#{loginController.email}"
+                                     required="true"
+                                     requiredMessage="Informe o e-mail"
+                                     style="width: 100%; margin-top: .4rem;"/>
+                    </div>
+
+                    <div class="p-field" style="margin-bottom: 1.5rem;">
+                        <p:outputLabel for="senha" value="Senha"/>
+                        <p:password id="senha"
+                                    value="#{loginController.senha}"
+                                    required="true"
+                                    requiredMessage="Informe a senha"
+                                    feedback="false"
+                                    style="width: 100%; margin-top: .4rem;"/>
+                    </div>
+
+                    <p:commandButton value="Entrar"
+                                     action="#{loginController.validarLogin}"
+                                     icon="pi pi-sign-in"
+                                     style="width: 100%;"
+                                     update="msgs"/>
+                </h:form>
+            </div>
+        </div>
+    </h:body>
+</html>

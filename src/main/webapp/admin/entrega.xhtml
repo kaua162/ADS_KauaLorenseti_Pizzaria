@@ -1,0 +1,121 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+<ui:define name="title">
+<h:outputText value="Entrega"/>
+</ui:define>
+<ui:define name="content">
+<h:form id="frmList">
+<p:growl id="growl" showDetail="true"/>
+<h:panelGroup id="pngList">
+<p:fieldset toggleable="true">
+<p:dataTable id="datalist" value="#{entregaController.entregaList}" var="item" selectionMode="single" selection="#{entregaController.selected}" widgetVar="datalistEntregaWidgetVar" rowKey="#{item.id}" paginator="true" rows="5" rowsPerPageTemplate="5,10,50,100" emptyMessage="Nenhuma entrega cadastrada...">
+<p:ajax event="rowSelect" update="btnEdit btnDelete btnView"/>
+<p:ajax event="rowUnselect" update="btnEdit btnDelete btnView"/>
+<p:column width="4%" sortBy="#{item.id}">
+<f:facet name="header">
+<h:outputText value="ID"/>
+</f:facet>
+<h:outputText value="#{item.id}"/>
+</p:column>
+<p:column width="6%" sortBy="#{item.pedido.id}">
+<f:facet name="header">
+<h:outputText value="Pedido #"/>
+</f:facet>
+<h:outputText value="#{item.pedido.id}"/>
+</p:column>
+<p:column width="12%" sortBy="#{item.pedido.cliente.nome}" filterBy="#{item.pedido.cliente.nome}">
+<f:facet name="header">
+<h:outputText value="Cliente"/>
+</f:facet>
+<h:outputText value="#{item.pedido.cliente.nome}"/>
+</p:column>
+<p:column width="15%">
+<f:facet name="header">
+<h:outputText value="Endereço de Entrega"/>
+</f:facet>
+<h:outputText value="#{item.enderecoEntrega}"/>
+</p:column>
+<p:column width="8%" sortBy="#{item.status}">
+<f:facet name="header">
+<h:outputText value="Status"/>
+</f:facet>
+<h:outputText value="#{item.status.descricao}"/>
+</p:column>
+<f:facet name="footer">
+<p:commandButton id="btnCreate" value="Incluir Entrega" icon="pi pi-file" actionListener="#{entregaController.prepareAdicionar()}" update=":CreateForm" oncomplete="PF('dlgCreate').show()"/>
+<p:commandButton id="btnEdit" icon="pi pi-user-edit" value="Editar Entrega" update=":EditForm" oncomplete="PF('dlgEdit').show()" disabled="#{empty entregaController.selected}"/>
+<p:commandButton id="btnDelete" icon="pi pi-trash" value="Excluir Entrega" actionListener="#{entregaController.deletarEntrega()}" update=":frmList" disabled="#{empty entregaController.selected}">
+<p:confirm header="Confirmar Exclusão" message="Você confirma exclusão do registro?" icon="ui-icon-alert"/>
+</p:commandButton>
+<p:commandButton id="btnView" icon="pi pi-eye" value="Detalhes da Entrega" update="formView" oncomplete="PF('dlgView').show()" disabled="#{empty entregaController.selected}"/>
+</f:facet>
+</p:dataTable>
+</p:fieldset>
+<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+<p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check"/>
+<p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-times"/>
+</p:confirmDialog>
+</h:panelGroup>
+</h:form>
+<p:dialog widgetVar="dlgCreate" modal="true" resizable="false" appendTo="@(body)" header="Criar Entrega">
+<h:form id="CreateForm">
+<p:growl id="growl" showDetail="true"/>
+<h:panelGroup id="display">
+<h:panelGrid columns="2" rendered="#{entregaController.entrega != null}">
+<p:outputLabel value="Pedido: " for="somPedido"/>
+<p:selectOneMenu id="somPedido" value="#{entregaController.entrega.pedido}" converter="pedidoConverter" required="true" requiredMessage="O atributo pedido é obrigatório" panelStyle="width:220px" filter="true" filterMatchMode="contains">
+<f:selectItem itemLabel="Selecione um pedido..."/>
+<f:selectItems value="#{entregaController.pedidoList}" var="ped" itemLabel="Pedido ##{ped.id} - #{ped.cliente.nome}" itemValue="#{ped}"/>
+</p:selectOneMenu>
+<p:outputLabel value="Endereço: " for="iptEndereco"/>
+<p:inputText id="iptEndereco" size="40" required="true" requiredMessage="O atributo endereço é obrigatório" value="#{entregaController.entrega.enderecoEntrega}" maxlength="300"/>
+<p:outputLabel value="Status: " for="somStatus"/>
+<p:selectOneMenu id="somStatus" value="#{entregaController.entrega.status}">
+<f:selectItems value="#{entregaController.statusList}" var="s" itemLabel="#{s.descricao}" itemValue="#{s}"/>
+</p:selectOneMenu>
+<p:outputLabel value="Observação: " for="iptObs"/>
+<p:inputTextarea id="iptObs" rows="3" cols="30" value="#{entregaController.entrega.observacao}"/>
+</h:panelGrid>
+<p:commandButton actionListener="#{entregaController.adicionarEntrega()}" value="Cadastrar" icon="pi pi-save" update="display,:frmList" onclick="dlgCreate.hide()"/>
+</h:panelGroup>
+</h:form>
+</p:dialog>
+<p:dialog widgetVar="dlgEdit" modal="true" resizable="false" appendTo="@(body)" header="Editar Entrega">
+<h:form id="EditForm">
+<p:growl id="growl" showDetail="true"/>
+<h:panelGroup id="display">
+<h:panelGrid columns="2" rendered="#{entregaController.selected != null}">
+<p:outputLabel value="Pedido:"/>
+<p:outputLabel value="Pedido ##{entregaController.selected.pedido.id} - #{entregaController.selected.pedido.cliente.nome}"/>
+<p:outputLabel value="Endereço: " for="iptEndereco"/>
+<p:inputText id="iptEndereco" size="40" required="true" value="#{entregaController.selected.enderecoEntrega}" maxlength="300"/>
+<p:outputLabel value="Status: " for="somStatus"/>
+<p:selectOneMenu id="somStatus" value="#{entregaController.selected.status}">
+<f:selectItems value="#{entregaController.statusList}" var="s" itemLabel="#{s.descricao}" itemValue="#{s}"/>
+</p:selectOneMenu>
+<p:outputLabel value="Observação: " for="iptObs"/>
+<p:inputTextarea id="iptObs" rows="3" cols="30" value="#{entregaController.selected.observacao}"/>
+</h:panelGrid>
+<p:commandButton actionListener="#{entregaController.editarEntrega()}" value="Salvar" icon="pi pi-save" update="display,:frmList" onclick="dlgEdit.hide()"/>
+</h:panelGroup>
+</h:form>
+</p:dialog>
+<p:dialog header="Visualizar Detalhes da Entrega" widgetVar="dlgView" height="280" width="500" showEffect="fade" modal="true">
+<h:form id="formView">
+<h:panelGrid columns="2" rendered="#{entregaController.selected != null}">
+<p:outputLabel value="ID:"/>
+<p:outputLabel value="#{entregaController.selected.id}"/>
+<p:outputLabel value="Pedido #:"/>
+<p:outputLabel value="#{entregaController.selected.pedido.id}"/>
+<p:outputLabel value="Cliente:"/>
+<p:outputLabel value="#{entregaController.selected.pedido.cliente.nome}"/>
+<p:outputLabel value="Endereço:"/>
+<p:outputLabel value="#{entregaController.selected.enderecoEntrega}"/>
+<p:outputLabel value="Status:"/>
+<p:outputLabel value="#{entregaController.selected.status.descricao}"/>
+<p:outputLabel value="Observação:"/>
+<p:outputLabel value="#{entregaController.selected.observacao}"/>
+</h:panelGrid>
+</h:form>
+</p:dialog>
+</ui:define>
+</ui:composition>

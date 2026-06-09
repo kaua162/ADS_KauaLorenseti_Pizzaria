@@ -1,0 +1,146 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+<ui:define name="title">
+<h:outputText value="Pedido"/>
+</ui:define>
+<ui:define name="content">
+<h:form id="frmList">
+<p:growl id="growl" showDetail="true"/>
+<h:panelGroup id="pngList">
+<p:fieldset toggleable="true">
+<p:dataTable id="datalist" value="#{pedidoController.pedidoList}" var="item" selectionMode="single" selection="#{pedidoController.selected}" widgetVar="datalistPedidoWidgetVar" rowKey="#{item.id}" paginator="true" rows="5" rowsPerPageTemplate="5,10,50,100" emptyMessage="Nenhum pedido cadastrado...">
+<p:ajax event="rowSelect" update="btnEdit btnDelete btnView"/>
+<p:ajax event="rowUnselect" update="btnEdit btnDelete btnView"/>
+<p:column width="4%" sortBy="#{item.id}">
+<f:facet name="header">
+<h:outputText value="ID"/>
+</f:facet>
+<h:outputText value="#{item.id}"/>
+</p:column>
+<p:column width="10%" sortBy="#{item.datahoraPedido}">
+<f:facet name="header">
+<h:outputText value="Data/Hora"/>
+</f:facet>
+<h:outputText value="#{item.datahoraPedido}">
+<f:convertDateTime pattern="dd/MM/yyyy HH:mm" timeZone="America/Sao_Paulo"/>
+</h:outputText>
+</p:column>
+<p:column width="12%" sortBy="#{item.cliente.nome}" filterBy="#{item.cliente.nome}">
+<f:facet name="header">
+<h:outputText value="Cliente"/>
+</f:facet>
+<h:outputText value="#{item.cliente.nome}"/>
+</p:column>
+<p:column width="12%" sortBy="#{item.pizza.nome}">
+<f:facet name="header">
+<h:outputText value="Pizza"/>
+</f:facet>
+<h:outputText value="#{item.pizza.nome}"/>
+</p:column>
+<p:column width="5%" sortBy="#{item.quantidade}">
+<f:facet name="header">
+<h:outputText value="Qtd."/>
+</f:facet>
+<h:outputText value="#{item.quantidade}"/>
+</p:column>
+<p:column width="10%" sortBy="#{item.valorTotal}">
+<f:facet name="header">
+<h:outputText value="Total (R$)"/>
+</f:facet>
+<h:outputText value="#{item.valorTotal}">
+<f:convertNumber type="currency" currencySymbol="R$ " locale="pt_BR"/>
+</h:outputText>
+</p:column>
+<p:column width="8%" sortBy="#{item.status}">
+<f:facet name="header">
+<h:outputText value="Status"/>
+</f:facet>
+<h:outputText value="#{item.status.descricao}"/>
+</p:column>
+<f:facet name="footer">
+<p:commandButton id="btnCreate" value="Incluir Pedido" icon="pi pi-file" actionListener="#{pedidoController.prepareAdicionar()}" update=":CreateForm" oncomplete="PF('dlgCreate').show()"/>
+<p:commandButton id="btnEdit" icon="pi pi-user-edit" value="Editar Pedido" update=":EditForm" oncomplete="PF('dlgEdit').show()" disabled="#{empty pedidoController.selected}"/>
+<p:commandButton id="btnDelete" icon="pi pi-trash" value="Excluir Pedido" actionListener="#{pedidoController.deletarPedido()}" update=":frmList" disabled="#{empty pedidoController.selected}">
+<p:confirm header="Confirmar Exclusão" message="Você confirma exclusão do registro?" icon="ui-icon-alert"/>
+</p:commandButton>
+<p:commandButton id="btnView" icon="pi pi-eye" value="Detalhes do Pedido" update="formView" oncomplete="PF('dlgView').show()" disabled="#{empty pedidoController.selected}"/>
+</f:facet>
+</p:dataTable>
+</p:fieldset>
+<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+<p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check"/>
+<p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-times"/>
+</p:confirmDialog>
+</h:panelGroup>
+</h:form>
+<p:dialog widgetVar="dlgCreate" modal="true" resizable="false" appendTo="@(body)" header="Criar Pedido">
+<h:form id="CreateForm">
+<p:growl id="growl" showDetail="true"/>
+<h:panelGroup id="display">
+<h:panelGrid columns="2" rendered="#{pedidoController.pedido != null}">
+<p:outputLabel value="Cliente: " for="somCliente"/>
+<p:selectOneMenu id="somCliente" value="#{pedidoController.pedido.cliente}" converter="clienteConverter" required="true" requiredMessage="O atributo cliente é obrigatório" panelStyle="width:220px" filter="true" filterMatchMode="contains">
+<f:selectItem itemLabel="Selecione um cliente..."/>
+<f:selectItems value="#{pedidoController.clienteList}" var="c" itemLabel="#{c.nome}" itemValue="#{c}"/>
+</p:selectOneMenu>
+<p:outputLabel value="Pizza: " for="somPizza"/>
+<p:selectOneMenu id="somPizza" value="#{pedidoController.pedido.pizza}" converter="pizzaConverter" required="true" requiredMessage="O atributo pizza é obrigatório" panelStyle="width:220px" filter="true" filterMatchMode="contains">
+<f:selectItem itemLabel="Selecione uma pizza..."/>
+<f:selectItems value="#{pedidoController.pizzaList}" var="pz" itemLabel="#{pz.nome} - R$ #{pz.preco}" itemValue="#{pz}"/>
+</p:selectOneMenu>
+<p:outputLabel value="Quantidade: " for="iptQtd"/>
+<p:spinner id="iptQtd" value="#{pedidoController.pedido.quantidade}" min="1" max="99" required="true" requiredMessage="O atributo quantidade é obrigatório"/>
+<p:outputLabel value="Status: " for="somStatus"/>
+<p:selectOneMenu id="somStatus" value="#{pedidoController.pedido.status}">
+<f:selectItems value="#{pedidoController.statusList}" var="s" itemLabel="#{s.descricao}" itemValue="#{s}"/>
+</p:selectOneMenu>
+</h:panelGrid>
+<p:commandButton actionListener="#{pedidoController.adicionarPedido()}" value="Cadastrar" icon="pi pi-save" update="display,:frmList" onclick="dlgCreate.hide()"/>
+</h:panelGroup>
+</h:form>
+</p:dialog>
+<p:dialog widgetVar="dlgEdit" modal="true" resizable="false" appendTo="@(body)" header="Editar Pedido">
+<h:form id="EditForm">
+<p:growl id="growl" showDetail="true"/>
+<h:panelGroup id="display">
+<h:panelGrid columns="2" rendered="#{pedidoController.selected != null}">
+<p:outputLabel value="Cliente: " for="somCliente"/>
+<p:selectOneMenu id="somCliente" value="#{pedidoController.selected.cliente}" converter="clienteConverter" panelStyle="width:220px" filter="true" filterMatchMode="contains">
+<f:selectItems value="#{pedidoController.clienteList}" var="c" itemLabel="#{c.nome}" itemValue="#{c}"/>
+</p:selectOneMenu>
+<p:outputLabel value="Pizza: " for="somPizza"/>
+<p:selectOneMenu id="somPizza" value="#{pedidoController.selected.pizza}" converter="pizzaConverter" panelStyle="width:220px" filter="true" filterMatchMode="contains">
+<f:selectItems value="#{pedidoController.pizzaList}" var="pz" itemLabel="#{pz.nome} - R$ #{pz.preco}" itemValue="#{pz}"/>
+</p:selectOneMenu>
+<p:outputLabel value="Quantidade: " for="iptQtd"/>
+<p:spinner id="iptQtd" value="#{pedidoController.selected.quantidade}" min="1" max="99"/>
+<p:outputLabel value="Status: " for="somStatus"/>
+<p:selectOneMenu id="somStatus" value="#{pedidoController.selected.status}">
+<f:selectItems value="#{pedidoController.statusList}" var="s" itemLabel="#{s.descricao}" itemValue="#{s}"/>
+</p:selectOneMenu>
+</h:panelGrid>
+<p:commandButton actionListener="#{pedidoController.editarPedido()}" value="Salvar" icon="pi pi-save" update="display,:frmList" onclick="dlgEdit.hide()"/>
+</h:panelGroup>
+</h:form>
+</p:dialog>
+<p:dialog header="Visualizar Detalhes do Pedido" widgetVar="dlgView" height="300" width="500" showEffect="fade" modal="true">
+<h:form id="formView">
+<h:panelGrid columns="2" rendered="#{pedidoController.selected != null}">
+<p:outputLabel value="ID:"/>
+<p:outputLabel value="#{pedidoController.selected.id}"/>
+<p:outputLabel value="Cliente:"/>
+<p:outputLabel value="#{pedidoController.selected.cliente.nome}"/>
+<p:outputLabel value="Pizza:"/>
+<p:outputLabel value="#{pedidoController.selected.pizza.nome}"/>
+<p:outputLabel value="Quantidade:"/>
+<p:outputLabel value="#{pedidoController.selected.quantidade}"/>
+<p:outputLabel value="Valor Total:"/>
+<h:outputText value="#{pedidoController.selected.valorTotal}">
+<f:convertNumber type="currency" currencySymbol="R$ " locale="pt_BR"/>
+</h:outputText>
+<p:outputLabel value="Status:"/>
+<p:outputLabel value="#{pedidoController.selected.status.descricao}"/>
+</h:panelGrid>
+</h:form>
+</p:dialog>
+</ui:define>
+</ui:composition>
