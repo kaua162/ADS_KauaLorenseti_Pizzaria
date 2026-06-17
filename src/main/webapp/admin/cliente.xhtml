@@ -1,0 +1,112 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+<ui:define name="title">
+<h:outputText value="Cliente"/>
+</ui:define>
+<ui:define name="content">
+<h:form id="frmList">
+<p:growl id="growl" showDetail="true"/>
+<h:panelGroup id="pngList">
+<p:fieldset toggleable="true">
+<p:dataTable id="datalist" value="#{clienteController.clienteList}" var="item" selectionMode="single" selection="#{clienteController.selected}" widgetVar="datalistClienteWidgetVar" rowKey="#{item.id}" paginator="true" rows="5" rowsPerPageTemplate="5,10,50,100" emptyMessage="Nenhum cliente cadastrado...">
+<p:ajax event="rowSelect" update="btnEdit btnDelete btnView"/>
+<p:ajax event="rowUnselect" update="btnEdit btnDelete btnView"/>
+<p:column width="4%" sortBy="#{item.id}" filterBy="#{item.id}">
+<f:facet name="header">
+<h:outputText value="ID"/>
+</f:facet>
+<h:outputText value="#{item.id}"/>
+</p:column>
+<p:column width="15%" sortBy="#{item.nome}" filterBy="#{item.nome}">
+<f:facet name="header">
+<h:outputText value="Nome"/>
+</f:facet>
+<h:outputText value="#{item.nome}"/>
+</p:column>
+<p:column width="15%" sortBy="#{item.email}" filterBy="#{item.email}">
+<f:facet name="header">
+<h:outputText value="E-mail"/>
+</f:facet>
+<h:outputText value="#{item.email}"/>
+</p:column>
+<p:column width="10%" sortBy="#{item.telefone}">
+<f:facet name="header">
+<h:outputText value="Telefone"/>
+</f:facet>
+<h:outputText value="#{item.telefone}"/>
+</p:column>
+<p:column width="15%">
+<f:facet name="header">
+<h:outputText value="Endereço"/>
+</f:facet>
+<h:outputText value="#{item.endereco}"/>
+</p:column>
+<f:facet name="footer">
+<p:commandButton id="btnCreate" value="Incluir Cliente" icon="pi pi-file" actionListener="#{clienteController.prepareAdicionar()}" update=":CreateForm" oncomplete="PF('dlgCreate').show()"/>
+<p:commandButton id="btnEdit" icon="pi pi-user-edit" value="Editar Cliente" update=":EditForm" oncomplete="PF('dlgEdit').show()" disabled="#{empty clienteController.selected}"/>
+<p:commandButton id="btnDelete" icon="pi pi-trash" value="Excluir Cliente" actionListener="#{clienteController.deletarCliente()}" update=":frmList" disabled="#{empty clienteController.selected}">
+<p:confirm header="Confirmar Exclusão" message="Você confirma exclusão do registro?" icon="ui-icon-alert"/>
+</p:commandButton>
+<p:commandButton id="btnView" icon="pi pi-eye" value="Detalhes do Cliente" update="formView" oncomplete="PF('dlgView').show()" disabled="#{empty clienteController.selected}"/>
+</f:facet>
+</p:dataTable>
+</p:fieldset>
+<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+<p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check"/>
+<p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-times"/>
+</p:confirmDialog>
+</h:panelGroup>
+</h:form>
+<p:dialog widgetVar="dlgCreate" modal="true" resizable="false" appendTo="@(body)" header="Criar Cliente">
+<h:form id="CreateForm">
+<p:growl id="growl" showDetail="true"/>
+<h:panelGroup id="display">
+<h:panelGrid columns="2" rendered="#{clienteController.cliente != null}">
+<p:outputLabel value="Nome: " for="iptNome"/>
+<p:inputText id="iptNome" size="40" required="true" requiredMessage="O atributo nome é obrigatório" value="#{clienteController.cliente.nome}" maxlength="200"/>
+<p:outputLabel value="E-mail: " for="iptEmail"/>
+<p:inputText id="iptEmail" size="40" required="true" requiredMessage="O atributo e-mail é obrigatório" value="#{clienteController.cliente.email}" maxlength="150"/>
+<p:outputLabel value="Telefone: " for="iptTelefone"/>
+<p:inputText id="iptTelefone" size="20" required="true" requiredMessage="O atributo telefone é obrigatório" value="#{clienteController.cliente.telefone}" maxlength="20"/>
+<p:outputLabel value="Endereço: " for="iptEndereco"/>
+<p:inputText id="iptEndereco" size="40" value="#{clienteController.cliente.endereco}" maxlength="300"/>
+</h:panelGrid>
+<p:commandButton actionListener="#{clienteController.adicionarCliente()}" value="Cadastrar" icon="pi pi-save" update="display,:frmList" onclick="dlgCreate.hide()"/>
+</h:panelGroup>
+</h:form>
+</p:dialog>
+<p:dialog widgetVar="dlgEdit" modal="true" resizable="false" appendTo="@(body)" header="Editar Cliente">
+<h:form id="EditForm">
+<p:growl id="growl" showDetail="true"/>
+<h:panelGroup id="display">
+<h:panelGrid columns="2" rendered="#{clienteController.selected != null}">
+<p:outputLabel value="Nome: " for="iptNome"/>
+<p:inputText id="iptNome" size="40" required="true" requiredMessage="O atributo nome é obrigatório" value="#{clienteController.selected.nome}" maxlength="200"/>
+<p:outputLabel value="E-mail: " for="iptEmail"/>
+<p:inputText id="iptEmail" size="40" required="true" requiredMessage="O atributo e-mail é obrigatório" value="#{clienteController.selected.email}" maxlength="150"/>
+<p:outputLabel value="Telefone: " for="iptTelefone"/>
+<p:inputText id="iptTelefone" size="20" required="true" requiredMessage="O atributo telefone é obrigatório" value="#{clienteController.selected.telefone}" maxlength="20"/>
+<p:outputLabel value="Endereço: " for="iptEndereco"/>
+<p:inputText id="iptEndereco" size="40" value="#{clienteController.selected.endereco}" maxlength="300"/>
+</h:panelGrid>
+<p:commandButton actionListener="#{clienteController.editarCliente()}" value="Salvar" icon="pi pi-save" update="display,:frmList" onclick="dlgEdit.hide()"/>
+</h:panelGroup>
+</h:form>
+</p:dialog>
+<p:dialog header="Visualizar Detalhes do Cliente" widgetVar="dlgView" height="250" width="500" showEffect="fade" modal="true">
+<h:form id="formView">
+<h:panelGrid columns="2" rendered="#{clienteController.selected != null}">
+<p:outputLabel value="ID:"/>
+<p:outputLabel value="#{clienteController.selected.id}"/>
+<p:outputLabel value="Nome:"/>
+<p:outputLabel value="#{clienteController.selected.nome}"/>
+<p:outputLabel value="E-mail:"/>
+<p:outputLabel value="#{clienteController.selected.email}"/>
+<p:outputLabel value="Telefone:"/>
+<p:outputLabel value="#{clienteController.selected.telefone}"/>
+<p:outputLabel value="Endereço:"/>
+<p:outputLabel value="#{clienteController.selected.endereco}"/>
+</h:panelGrid>
+</h:form>
+</p:dialog>
+</ui:define>
+</ui:composition>

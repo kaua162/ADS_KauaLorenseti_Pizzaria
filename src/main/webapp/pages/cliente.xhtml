@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="content">
+            <h:form id="formCliente">
+                <p:growl id="msgs" showDetail="true"/>
+                <p:dataTable id="tabelaCliente" value="#{clienteController.clienteList}"
+                             var="c" paginator="true" rows="10">
+                    <f:facet name="header">
+                        <p:commandButton value="Novo Cliente" icon="pi pi-plus"
+                                         actionListener="#{clienteController.novoCliente}"
+                                         oncomplete="PF('dlgCliente').show()"
+                                         update=":formCliente:dlgCliente"/>
+                    </f:facet>
+                    <p:column headerText="ID" sortBy="#{c.id}">
+                        <h:outputText value="#{c.id}"/>
+                    </p:column>
+                    <p:column headerText="Nome" sortBy="#{c.nome}" filterBy="#{c.nome}">
+                        <h:outputText value="#{c.nome}"/>
+                    </p:column>
+                    <p:column headerText="Telefone">
+                        <h:outputText value="#{c.telefone}"/>
+                    </p:column>
+                    <p:column headerText="Endereço">
+                        <h:outputText value="#{c.endereco}"/>
+                    </p:column>
+                    <p:column headerText="Ações">
+                        <p:commandButton icon="pi pi-pencil" title="Editar"
+                                         actionListener="#{clienteController.selecionarCliente(c)}"
+                                         oncomplete="PF('dlgCliente').show()"
+                                         update=":formCliente:dlgCliente"/>
+                        <p:commandButton icon="pi pi-trash" title="Excluir"
+                                         actionListener="#{clienteController.selecionarCliente(c)}"
+                                         oncomplete="PF('dlgConfirm').show()"
+                                         update=":formCliente:dlgConfirm"/>
+                    </p:column>
+                </p:dataTable>
+
+                <p:dialog header="Cadastro de Cliente" widgetVar="dlgCliente"
+                          id="dlgCliente" modal="true" resizable="false">
+                    <h:panelGrid columns="2" style="margin:10px">
+                        <h:outputLabel value="Nome:"/>
+                        <p:inputText value="#{clienteController.cliente.nome}"/>
+                        <h:outputLabel value="Telefone:"/>
+                        <p:inputText value="#{clienteController.cliente.telefone}"/>
+                        <h:outputLabel value="Endereço:"/>
+                        <p:inputText value="#{clienteController.cliente.endereco}"/>
+                    </h:panelGrid>
+                    <p:commandButton value="Salvar"
+                                     action="#{clienteController.cliente.id == 0 ?
+                                              clienteController.adicionarCliente() :
+                                              clienteController.editarCliente()}"
+                                     oncomplete="PF('dlgCliente').hide()"
+                                     update=":formCliente:tabelaCliente :formCliente:msgs"/>
+                </p:dialog>
+
+                <p:confirmDialog id="dlgConfirm" widgetVar="dlgConfirm"
+                                 message="Deseja excluir este cliente?" header="Confirmação">
+                    <p:commandButton value="Sim" icon="pi pi-check"
+                                     action="#{clienteController.excluirCliente}"
+                                     oncomplete="PF('dlgConfirm').hide()"
+                                     update=":formCliente:tabelaCliente :formCliente:msgs"/>
+                    <p:commandButton value="Não" icon="pi pi-times"
+                                     onclick="PF('dlgConfirm').hide()"/>
+                </p:confirmDialog>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>La Fornalha - Login</title>
+
+    <h:outputStylesheet 
+        library="manhattan-layout"
+        name="css/layout-orange-indigo.css"/>
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background-image: url("#{resource['imagens/fundo.jpeg']}");
+            background-size: cover;
+            /* mostra mais a parte de baixo da imagem */
+            background-position: center bottom;
+            background-repeat: no-repeat;
+        }
+
+        .login-wrapper {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 120px;
+            background: rgba(0,0,0,0.45);
+        }
+
+        .login-panel {
+            width: 380px;
+            padding: 35px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 18px;
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .login-logo {
+            text-align: center;
+            font-size: 30px;
+            font-weight: bold;
+            color: #e65100;
+            margin-bottom: 25px;
+        }
+
+        .campo {
+            margin-bottom: 20px;
+        }
+
+        .ui-button {
+            background: #e65100 !important;
+            border-color: #e65100 !important;
+        }
+    </style>
+</h:head>
+
+<h:body>
+
+<div class="login-wrapper">
+
+    <div class="login-panel">
+
+        <div class="login-logo">
+            🍕 La Fornalha
+        </div>
+
+        <h:form id="formLogin">
+
+            <p:messages
+                id="msgs"
+                showDetail="true"
+                closable="true"/>
+
+            <div class="campo">
+                <p:outputLabel value="E-mail"/>
+                <p:inputText
+                    id="email"
+                    value="#{loginController.email}"
+                    required="true"
+                    requiredMessage="Informe o e-mail"
+                    style="width:100%"/>
+            </div>
+
+            <div class="campo">
+                <p:outputLabel value="Senha"/>
+                <p:password
+                    id="senha"
+                    value="#{loginController.senha}"
+                    required="true"
+                    requiredMessage="Informe a senha"
+                    feedback="false"
+                    style="width:100%"/>
+            </div>
+
+            <p:commandButton
+                value="Entrar"
+                icon="pi pi-sign-in"
+                action="#{loginController.validarLogin}"
+                update="msgs"
+                style="width:100%"/>
+
+        </h:form>
+
+    </div>
+
+</div>
+
+</h:body>
+</html>

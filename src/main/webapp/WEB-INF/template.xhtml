@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      lang="pt-BR">
+<h:head>
+    <f:facet name="first">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+    </f:facet>
+    <title>Pizzaria | <ui:insert name="title">Sistema</ui:insert></title>
+    <h:outputScript name="js/layout.js" library="manhattan-layout"/>
+    <h:outputScript name="js/prism.js" library="manhattan-layout"/>
+    <ui:insert name="head"/>
+    <style type="text/css">
+        .layout-topbar { background: linear-gradient(135deg, #1a1a1a, #2d2d2d) !important; border-bottom: 3px solid #e53935 !important; box-shadow: 0 2px 20px rgba(229,57,53,0.3) !important; }
+        .layout-topbar .topbar-menu > li > a { color: #cccccc !important; }
+        .layout-topbar .topbar-menu > li > a:hover { color: #e53935 !important; }
+        .topbar-badge { background: #e53935 !important; }
+        .layout-sidebar { background: linear-gradient(180deg, #111111, #1a1a1a) !important; border-right: 2px solid #e53935 !important; box-shadow: 4px 0 25px rgba(0,0,0,0.6) !important; }
+        .layout-menu li a { color: #aaaaaa !important; border-radius: 10px !important; margin: 3px 10px !important; padding: 10px 14px !important; transition: all 0.3s ease !important; font-weight: 500 !important; }
+        .layout-menu li a:hover { background: rgba(229,57,53,0.15) !important; color: #e53935 !important; transform: translateX(5px) !important; border-left: 3px solid #e53935 !important; }
+        .layout-menu li.active-menuitem > a { background: linear-gradient(135deg, #e53935, #b71c1c) !important; color: #ffffff !important; box-shadow: 0 4px 15px rgba(229,57,53,0.4) !important; }
+        .layout-menu li a i { color: #e53935 !important; margin-right: 8px !important; }
+        .layout-menu li.active-menuitem > a i { color: #ffffff !important; }
+        .layout-content { background: #f4f4f4 !important; min-height: calc(100vh - 130px) !important; padding: 2rem !important; }
+        .ui-fieldset { border-radius: 16px !important; border: none !important; box-shadow: 0 4px 25px rgba(0,0,0,0.08) !important; overflow: hidden !important; background: #ffffff !important; }
+        .ui-fieldset .ui-fieldset-legend { background: linear-gradient(135deg, #1a1a1a, #2d2d2d) !important; color: #f5f5f5 !important; border: none !important; border-radius: 8px !important; padding: 8px 16px !important; font-weight: 600 !important; }
+        .ui-datatable .ui-datatable-thead > tr > th { background: linear-gradient(135deg, #1a1a1a, #2d2d2d) !important; color: #f5f5f5 !important; border: none !important; font-weight: 600 !important; padding: 14px 12px !important; }
+        .ui-datatable .ui-datatable-thead > tr > th .ui-column-filter { background: #2d2d2d !important; border: 1px solid #444 !important; color: #fff !important; border-radius: 6px !important; margin-top: 6px !important; padding: 4px 8px !important; }
+        .ui-datatable tbody tr { transition: all 0.2s ease !important; border-bottom: 1px solid #f0f0f0 !important; }
+        .ui-datatable tbody tr:nth-child(even) { background: #fafafa !important; }
+        .ui-datatable tbody tr:hover { background: #fff5f5 !important; border-left: 4px solid #e53935 !important; }
+        .ui-datatable tbody tr.ui-state-highlight { background: linear-gradient(135deg, #e53935, #b71c1c) !important; color: #ffffff !important; }
+        .ui-datatable .ui-datatable-tfoot > tr > td { background: linear-gradient(135deg, #1a1a1a, #2d2d2d) !important; border-top: 3px solid #e53935 !important; padding: 14px 12px !important; }
+        .ui-button, .p-button { background: linear-gradient(135deg, #e53935, #c62828) !important; border: none !important; border-radius: 10px !important; font-weight: 600 !important; box-shadow: 0 4px 15px rgba(229,57,53,0.35) !important; transition: all 0.3s ease !important; padding: 8px 16px !important; }
+        .ui-button:hover, .p-button:hover { background: linear-gradient(135deg, #ff1744, #e53935) !important; box-shadow: 0 6px 20px rgba(229,57,53,0.5) !important; transform: translateY(-2px) !important; }
+        .ui-button.ui-button-danger, .p-button.ui-button-danger { background: linear-gradient(135deg, #212121, #1a1a1a) !important; }
+        .ui-button.ui-button-secondary, .p-button.ui-button-secondary { background: linear-gradient(135deg, #757575, #616161) !important; }
+        .ui-confirmdialog-yes { background: linear-gradient(135deg, #e53935, #b71c1c) !important; }
+        .ui-confirmdialog-no { background: linear-gradient(135deg, #757575, #616161) !important; }
+        .ui-dialog { border-radius: 16px !important; overflow: hidden !important; box-shadow: 0 25px 60px rgba(0,0,0,0.35) !important; border: 1px solid rgba(229,57,53,0.3) !important; }
+        .ui-dialog .ui-dialog-titlebar { background: linear-gradient(135deg, #1a1a1a, #2d2d2d) !important; color: #f5f5f5 !important; border: none !important; font-weight: 700 !important; padding: 18px 22px !important; }
+        .ui-dialog .ui-dialog-titlebar-close { color: #e53935 !important; }
+        .ui-dialog .ui-dialog-content { padding: 24px !important; background: #ffffff !important; }
+        .ui-inputtext, .ui-inputtextarea { border: 2px solid #e0e0e0 !important; border-radius: 10px !important; transition: all 0.3s ease !important; padding: 9px 14px !important; }
+        .ui-inputtext:focus, .ui-inputtextarea:focus { border-color: #e53935 !important; box-shadow: 0 0 0 3px rgba(229,57,53,0.12) !important; outline: none !important; }
+        .ui-selectonemenu { border: 2px solid #e0e0e0 !important; border-radius: 10px !important; }
+        .ui-selectonemenu:hover { border-color: #e53935 !important; }
+        .ui-selectonemenu-trigger { background: #e53935 !important; color: #fff !important; border-radius: 0 8px 8px 0 !important; }
+        .ui-paginator { background: linear-gradient(135deg, #1a1a1a, #2d2d2d) !important; border: none !important; padding: 12px !important; }
+        .ui-paginator .ui-paginator-page, .ui-paginator .ui-paginator-first, .ui-paginator .ui-paginator-prev, .ui-paginator .ui-paginator-next, .ui-paginator .ui-paginator-last { color: #aaa !important; border-radius: 8px !important; margin: 2px !important; transition: all 0.2s !important; }
+        .ui-paginator .ui-paginator-page.ui-state-active { background: #e53935 !important; color: #fff !important; font-weight: 700 !important; }
+        .ui-paginator .ui-paginator-page:hover { background: #333 !important; color: #fff !important; }
+        .ui-growl-item-container.ui-growl-message-info { background: linear-gradient(135deg, #e53935, #b71c1c) !important; border: none !important; border-radius: 12px !important; }
+        .layout-footer { background: #1a1a1a !important; color: #777 !important; border-top: 2px solid #e53935 !important; }
+        .ui-chkbox .ui-chkbox-box.ui-state-active { background: #e53935 !important; border-color: #e53935 !important; }
+        .ui-spinner-button { background: #e53935 !important; border: none !important; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #e53935; border-radius: 3px; }
+        .page-title { font-size: 1.6rem !important; font-weight: 700 !important; color: #1a1a1a !important; margin-bottom: 1.5rem !important; padding-bottom: 0.75rem !important; border-bottom: 3px solid #e53935 !important; display: flex !important; align-items: center !important; gap: 10px !important; }
+        .page-title i { color: #e53935 !important; }
+        .stat-card { background: linear-gradient(135deg, #e53935, #b71c1c); color: #fff; border-radius: 14px; padding: 1.2rem 2rem; min-width: 180px; box-shadow: 0 6px 20px rgba(229,57,53,0.35); display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; }
+        .stat-card i { font-size: 2rem; opacity: 0.9; }
+        .stat-card .stat-label { font-size: 0.8rem; opacity: 0.85; font-weight: 500; }
+        .stat-card .stat-value { font-size: 1.8rem; font-weight: 700; line-height: 1.2; }
+        .detail-card { background: #fff5f5; border-radius: 10px; padding: 0.8rem; border-left: 3px solid #e53935; }
+        .detail-label { font-size: 0.75rem; color: #777; font-weight: 600; margin-bottom: 4px; }
+        .detail-value { font-weight: 500; }
+        .form-field { display: flex; flex-direction: column; gap: 4px; }
+        .form-field .ui-outputlabel { font-weight: 600 !important; }
+        .dialog-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 0.5rem; }
+    </style>
+</h:head>
+<h:body>
+    <div class="layout-wrapper layout-slim layout-light">
+        <div class="layout-main">
+            <ui:include src="./topbar.xhtml"/>
+            <div class="layout-content">
+                <div class="page-title">
+                    <i class="pi pi-circle-fill"/>
+                    <ui:insert name="title">Sistema de Pizzaria</ui:insert>
+                </div>
+                <ui:insert name="content"/>
+            </div>
+            <ui:include src="./footer.xhtml"/>
+            <div class="layout-main-mask"></div>
+        </div>
+        <ui:include src="./config.xhtml"/>
+        <ui:include src="./rightpanel.xhtml"/>
+        <ui:include src="./sidebar.xhtml"/>
+    </div>
+    <p:ajaxStatus style="width:32px;height:32px;position:fixed;right:7px;bottom:7px">
+        <f:facet name="start">
+            <i class="pi pi-spin pi-spinner layout-ajax-loader-icon" aria-hidden="true"/>
+        </f:facet>
+        <f:facet name="complete">
+            <h:outputText value=""/>
+        </f:facet>
+    </p:ajaxStatus>
+    <h:outputStylesheet name="css/primeicons.css"             library="manhattan-layout"/>
+    <h:outputStylesheet name="css/primeflex.min.css"          library="manhattan-layout"/>
+    <h:outputStylesheet name="css/layout-cyan-deeporange.css" library="manhattan-layout"/>
+</h:body>
+</html>
